@@ -1,1 +1,0 @@
-import{am as n,X as i}from"./index-b07e14c3.js";const r=(e,s)=>{s&&typeof s=="object"&&e.setOption(s);const t=()=>{e&&e.resize()};window.addEventListener("resize",t),n(()=>{window.removeEventListener("resize",t)}),i(()=>{window.removeEventListener("resize",t)})};export{r as u};
