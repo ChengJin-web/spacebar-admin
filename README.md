@@ -6,13 +6,13 @@ Spacebar 一款基于 Vue3.3、TypeScript、Vite4、Pinia、Element-Plus 开源�
 
 ## 代码仓库 ⭐
 
-- GitHub：https://github.com/chengkoi/Spacebar
+- GitHub：<https://github.com/chengkoi/Spacebar>
 
 ## 项目文档 📚
 
 - 项目更新日志：[CHANGELOG.md](./CHANGELOG.md)
 
-- 项目文档地址：https://docs.spacebar.top
+- 项目文档地址：<https://docs.spacebar.top>
 
 ## 项目功能 🔨
 
@@ -89,7 +89,7 @@ pnpm commit
 Spacebar
 ├─ .husky                 # husky 配置文件
 ├─ .vscode                # VSCode 推荐配置
-├─ build                  # Vite 配置项
+├─ config                 # Vite 配置项
 ├─ public                 # 静态资源文件（该文件夹不会被打包）
 ├─ src
 │  ├─ api                 # API 接口管理

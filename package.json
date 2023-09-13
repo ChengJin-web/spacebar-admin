@@ -1,12 +1,12 @@
 {
   "name": "spacebar-admin",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "spacebar-admin open source management system",
   "author": {
     "name": "Spacebar",
-    "email": "848130454@qq.com",
+    "email": "57589172@qq.com",
     "url": "https://github.com/chengkoi"
   },
   "license": "MIT",
