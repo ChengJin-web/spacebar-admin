@@ -10,13 +10,7 @@
       </el-input>
     </el-form-item>
     <el-form-item prop="password">
-      <el-input
-        v-model="loginForm.password"
-        type="password"
-        placeholder="密码：Spacebar@2023"
-        show-password
-        autocomplete="new-password"
-      >
+      <el-input v-model="loginForm.password" type="password" placeholder="密码：123456" show-password autocomplete="new-password">
         <template #prefix>
           <el-icon class="el-input__icon">
             <lock />
@@ -82,8 +76,8 @@ const login = (formEl: FormInstance | undefined) => {
       await initDynamicRouter();
 
       // 3.清空 tabs、keepAlive 数据
-      tabsStore.closeMultipleTab();
-      keepAliveStore.setKeepAliveName();
+      tabsStore.setTabs([]);
+      keepAliveStore.setKeepAliveName([]);
 
       // 4.跳转到首页
       router.push(HOME_URL);

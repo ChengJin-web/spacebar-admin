@@ -144,6 +144,20 @@
             "isAffix": false,
             "isKeepAlive": true
           }
+        },
+        {
+          "path": "/proTable/document",
+          "name": "proTableDocument",
+          "component": "/proTable/document/index",
+          "meta": {
+            "icon": "Menu",
+            "title": "ProTable 文档",
+            "isLink": "https://juejin.cn/post/7166068828202336263/#heading-14",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
         }
       ]
     },
@@ -391,20 +405,6 @@
             "isAffix": false,
             "isKeepAlive": true
           }
-        },
-        {
-          "path": "/dashboard/embedded",
-          "name": "embedded",
-          "component": "/dashboard/embedded/index",
-          "meta": {
-            "icon": "Menu",
-            "title": "内嵌页面",
-            "isLink": "",
-            "isHide": false,
-            "isFull": false,
-            "isAffix": false,
-            "isKeepAlive": true
-          }
         }
       ]
     },
@@ -486,7 +486,7 @@
       "redirect": "/echarts/waterChart",
       "meta": {
         "icon": "TrendCharts",
-        "title": "Echarts",
+        "title": "ECharts",
         "isLink": "",
         "isHide": false,
         "isFull": false,
@@ -929,7 +929,7 @@
     {
       "path": "/link",
       "name": "link",
-      "redirect": "/link/gitee",
+      "redirect": "/link/bing",
       "meta": {
         "icon": "Paperclip",
         "title": "外部链接",
@@ -940,6 +940,20 @@
         "isKeepAlive": true
       },
       "children": [
+        {
+          "path": "/link/bing",
+          "name": "bing",
+          "component": "/link/bing/index",
+          "meta": {
+            "icon": "Menu",
+            "title": "Bing 内嵌",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
         {
           "path": "/link/gitee",
           "name": "gitee",
@@ -969,13 +983,27 @@
           }
         },
         {
-          "path": "/link/spacebarDocs",
-          "name": "spacebarDocs",
-          "component": "/link/spacebarDocs/index",
+          "path": "/link/docs",
+          "name": "docs",
+          "component": "/link/docs/index",
           "meta": {
             "icon": "Menu",
             "title": "项目文档",
-            "isLink": "https://docs.spacebar.top",
+            "isLink": "https://docs.spicyboy.cn",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/link/juejin",
+          "name": "juejin",
+          "component": "/link/juejin/index",
+          "meta": {
+            "icon": "Menu",
+            "title": "掘金主页",
+            "isLink": "https://juejin.cn/user/3263814531551816/posts",
             "isHide": false,
             "isFull": false,
             "isAffix": false,
