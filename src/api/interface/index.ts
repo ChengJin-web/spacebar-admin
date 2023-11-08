@@ -6,6 +6,12 @@ export interface Result {
 
 // 请求响应参数（包含data）
 export interface ResultData<T = any> extends Result {
+  captchaEnabled: undefined;
+  img: string;
+  uuid: string;
+  captchaEnabled: undefined;
+  captchaEnabled: undefined;
+  [x: string]: undefined;
   data: T;
 }
 
@@ -35,12 +41,19 @@ export namespace Login {
   export interface ReqLoginForm {
     username: string;
     password: string;
+    uuid: string;
+    code: string;
   }
   export interface ResLogin {
     access_token: string;
   }
   export interface ResAuthButtons {
     [key: string]: string[];
+  }
+  export interface CodeImg {
+    captchaEnabled: boolean;
+    img: string;
+    uuid: string;
   }
 }
 

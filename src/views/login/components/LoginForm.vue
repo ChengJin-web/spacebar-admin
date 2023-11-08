@@ -24,6 +24,26 @@
         </template>
       </el-input>
     </el-form-item>
+
+    <el-form-item prop="code" v-if="captchaEnabled" style="display: flex; justify-content: space-between">
+      <div style="display: flex; justify-content: space-between; width: 100%">
+        <el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 70%">
+          <template #prefix>
+            <el-icon class="el-input__icon">
+              <lock />
+            </el-icon>
+          </template>
+        </el-input>
+        <div style="height: 38px">
+          <img
+            :src="codeUrl"
+            @click="getCode"
+            style="height: 40px; margin-bottom: 2px; vertical-align: middle; cursor: pointer"
+            alt=""
+          />
+        </div>
+      </div>
+    </el-form-item>
   </el-form>
   <div class="login-btn">
     <el-button :icon="CircleClose" round size="large" @click="resetForm(loginFormRef)"> 重置 </el-button>
@@ -40,7 +60,7 @@ import { HOME_URL } from "@/config";
 import { getTimeState } from "@/utils";
 import { Login } from "@/api/interface";
 import { ElNotification } from "element-plus";
-import { loginApi } from "@/api/modules/login";
+import { loginApi, getCodeImg } from "@/api/modules/login";
 import { useUserStore } from "@/stores/modules/user";
 import { useTabsStore } from "@/stores/modules/tabs";
 import { useKeepAliveStore } from "@/stores/modules/keepAlive";
@@ -55,6 +75,9 @@ const tabsStore = useTabsStore();
 const keepAliveStore = useKeepAliveStore();
 
 type FormInstance = InstanceType<typeof ElForm>;
+
+const captchaEnabled = ref(true);
+const codeUrl = ref("");
 const loginFormRef = ref<FormInstance>();
 const loginRules = reactive({
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
@@ -64,8 +87,20 @@ const loginRules = reactive({
 const loading = ref(false);
 const loginForm = reactive<Login.ReqLoginForm>({
   username: "",
-  password: ""
+  password: "",
+  uuid: "",
+  code: ""
 });
+
+const getCode = () => {
+  getCodeImg().then(res => {
+    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled;
+    if (captchaEnabled.value) {
+      codeUrl.value = "data:image/gif;base64," + res.img;
+      loginForm.uuid = res.uuid;
+    }
+  });
+};
 
 // login
 const login = (formEl: FormInstance | undefined) => {
@@ -115,6 +150,8 @@ onMounted(() => {
     }
   };
 });
+
+getCode();
 </script>
 
 <style scoped lang="scss">

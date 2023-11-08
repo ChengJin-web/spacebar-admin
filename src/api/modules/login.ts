@@ -4,6 +4,11 @@ import authMenuList from "@/assets/json/authMenuList.json";
 import authButtonList from "@/assets/json/authButtonList.json";
 import http from "@/api";
 
+// 获取验证码
+export const getCodeImg = () => {
+  return http.get<Login.CodeImg>("/captchaImage", {}, { loading: false });
+};
+
 /**
  * @name 登录模块
  */
