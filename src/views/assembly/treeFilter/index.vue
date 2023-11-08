@@ -2,7 +2,7 @@
   <div class="content-box">
     <TreeFilter
       label="name"
-      title="部门列表(单选)"
+      title="部门列表(单选)1"
       :request-api="getUserDepartment"
       :default-value="treeFilterValue.departmentId"
       @change="changeTreeFilter"

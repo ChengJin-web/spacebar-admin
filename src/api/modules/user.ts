@@ -7,7 +7,7 @@ import http from "@/api";
  */
 // 获取用户列表
 export const getUserList = (params: User.ReqUserParams) => {
-  return http.post<ResPage<User.ResUserList>>(PORT1 + `/user/list`, params);
+  return http.get<ResPage<User.ResUserList>>("system/user/list", params);
 };
 
 // 获取树形用户列表
@@ -62,7 +62,7 @@ export const getUserGender = () => {
 
 // 获取用户部门列表
 export const getUserDepartment = () => {
-  return http.get<User.ResDepartment[]>(PORT1 + `/user/department`);
+  return http.get<User.ResDepartment[]>("/system/user/deptTree");
 };
 
 // 获取用户角色字典
