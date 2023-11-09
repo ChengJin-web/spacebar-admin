@@ -7,7 +7,7 @@ import http from "@/api";
  */
 // 获取用户列表
 export const getUserList = (params: User.ReqUserParams) => {
-  return http.get<ResPage<User.ResUserList>>("system/user/list", params);
+  return http.get<ResPage<User.ResUserList>>("/system/user/list", params);
 };
 
 // 获取树形用户列表

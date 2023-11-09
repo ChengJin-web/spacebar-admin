@@ -47,19 +47,12 @@ import { useDownload } from "@/hooks/useDownload";
 import ProTable from "@/components/ProTable/index.vue";
 import TreeFilter from "@/components/TreeFilter/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
-import UserDrawer from "@/views/system/user/components/UserDrawer.vue";
+import UserDrawer from "@/views/system/accountManage/UserDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from "@element-plus/icons-vue";
-import {
-  getUserList,
-  deleteUser,
-  editUser,
-  addUser,
-  resetUserPassWord,
-  exportUserInfo,
-  BatchAddUser,
-  getUserDepartment
-} from "@/api/modules/user";
+import { listUser, delUser, addUser, updateUser, resetUserPwd } from "@/api/modules/system/user";
+
+import { exportUserInfo, BatchAddUser, getUserDepartment } from "@/api/modules/user";
 import { useDict } from "@/utils/dict";
 const { sys_normal_disable } = useDict("sys_normal_disable");
 
@@ -70,13 +63,12 @@ const getTableList = (params: any) => {
   newParams.createTime && (newParams.startTime = newParams.createTime[0]);
   newParams.createTime && (newParams.endTime = newParams.createTime[1]);
   delete newParams.createTime;
-  return getUserList(newParams);
+  return listUser(newParams);
 };
 
 // 跳转详情页
 const toDetail = () => {
   router.push(`/system/accountManage/detail/123456?params=detail-page`);
-  // router.push(`/proTable/useTreeFilter/detail/123456?params=detail-page`);
 };
 
 // ProTable 实例
@@ -111,7 +103,7 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
     width: 120,
     sortable: true
   },
-  { prop: "email", label: "手机号", search: { el: "input" } },
+  { prop: "phonenumber", label: "手机号", search: { el: "input" } },
   { prop: "email", label: "邮箱" },
   {
     prop: "status",
@@ -139,13 +131,13 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
 
 // 删除用户信息
 const deleteAccount = async (params: User.ResUserList) => {
-  await useHandleData(deleteUser, { id: [params.id] }, `删除【${params.username}】用户`);
+  await useHandleData(delUser, params.userId, `删除【${params.userName}】用户`);
   proTable.value?.getTableList();
 };
 
 // 重置用户密码
 const resetPass = async (params: User.ResUserList) => {
-  await useHandleData(resetUserPassWord, { id: params.id }, `重置【${params.username}】用户密码`);
+  await useHandleData(resetUserPwd, { id: params.userId, password: "@2023" }, `重置【${params.userName}】用户密码`);
   proTable.value?.getTableList();
 };
 
@@ -175,7 +167,7 @@ const openDrawer = (title: string, row: Partial<User.ResUserList> = {}) => {
     title,
     isView: title === "查看",
     row: { ...row },
-    api: title === "新增" ? addUser : title === "编辑" ? editUser : undefined,
+    api: title === "新增" ? addUser : title === "编辑" ? updateUser : undefined,
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);

@@ -10,24 +10,6 @@
       :model="drawerProps.row"
       :hide-required-asterisk="drawerProps.isView"
     >
-      <!-- <el-form-item label="用户头像" prop="avatar">
-        <UploadImg v-model:image-url="drawerProps.row!.avatar" width="135px" height="135px" :file-size="3">
-          <template #empty>
-            <el-icon><Avatar /></el-icon>
-            <span>请上传头像</span>
-          </template>
-          <template #tip> 头像大小不能超过 3M </template>
-        </UploadImg>
-      </el-form-item>
-      <el-form-item label="用户照片" prop="photo">
-        <UploadImgs v-model:file-list="drawerProps.row!.photo" height="140px" width="140px" border-radius="50%">
-          <template #empty>
-            <el-icon><Picture /></el-icon>
-            <span>请上传照片</span>
-          </template>
-          <template #tip> 照片大小不能超过 5M </template>
-        </UploadImgs>
-      </el-form-item> -->
       <el-form-item label="用户昵称" prop="nickName">
         <el-input v-model="drawerProps.row.nickName" placeholder="请输入用户昵称" maxlength="30" />
       </el-form-item>
@@ -107,11 +89,12 @@
 import { ref, reactive } from "vue";
 import { useDict } from "@/utils/dict";
 import { ElMessage, FormInstance } from "element-plus";
+import type { FormRules } from "element-plus";
 import { User } from "@/api/interface";
 
 const { sys_normal_disable, sys_user_sex } = useDict("sys_normal_disable", "sys_user_sex");
 
-const rules = reactive({
+const rules = reactive<FormRules>({
   userName: [
     { required: true, message: "用户名称不能为空", trigger: "blur" },
     { min: 2, max: 20, message: "用户名称长度必须介于 2 和 20 之间", trigger: "blur" }
