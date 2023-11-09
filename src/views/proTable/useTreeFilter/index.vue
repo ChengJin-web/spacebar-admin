@@ -1,10 +1,10 @@
 <template>
   <div class="main-box">
     <TreeFilter
-      label="label"
-      title="部门列表"
+      label="name"
+      title="部门列表(单选)"
       :request-api="getUserDepartment"
-      :default-value="initParam.deptId"
+      :default-value="initParam.departmentId"
       @change="changeTreeFilter"
     />
     <div class="table-box">
@@ -13,7 +13,6 @@
         :columns="columns"
         :request-api="getUserList"
         :init-param="initParam"
-        :data-callback="dataCallback"
         :search-col="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }"
       >
         <!-- 表格 header 按钮 -->
@@ -40,7 +39,7 @@
 import { ref, reactive } from "vue";
 import { User } from "@/api/interface";
 import { useRouter } from "vue-router";
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useDownload } from "@/hooks/useDownload";
 import ProTable from "@/components/ProTable/index.vue";
@@ -73,38 +72,31 @@ const toDetail = () => {
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable(之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ deptId: "1" });
-
-const dataCallback = (data: any) => {
-  return {
-    list: data.rows,
-    total: data.total,
-    pageNum: data.pageNum,
-    pageSize: data.pageSize
-  };
-};
+const initParam = reactive({ departmentId: "1" });
 
 // 树形筛选切换
 const changeTreeFilter = (val: string) => {
+  ElMessage.success("请注意查看请求参数变化 🤔");
   proTable.value!.pageable.pageNum = 1;
-  initParam.deptId = val;
+  initParam.departmentId = val;
 };
 
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
-  { prop: "userId", label: "用户编号", width: 80 },
-  { prop: "userName", label: "用户姓名", width: 120, search: { el: "input" } },
-  { prop: "nickName", label: "用户昵称", width: 120 },
+  { type: "index", label: "#", width: 80 },
+  { prop: "username", label: "用户姓名", width: 120, search: { el: "input" } },
   {
-    prop: "deptId",
-    label: "部门",
+    prop: "gender",
+    label: "性别",
     width: 120,
     sortable: true,
     enum: getUserGender,
     search: { el: "select" },
     fieldNames: { label: "genderLabel", value: "genderValue" }
   },
+  { prop: "idCard", label: "身份证号" },
   { prop: "email", label: "邮箱" },
+  { prop: "address", label: "居住地址" },
   {
     prop: "status",
     label: "用户状态",
