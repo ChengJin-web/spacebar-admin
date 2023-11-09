@@ -11,16 +11,17 @@
       <ProTable
         ref="proTable"
         :columns="columns"
-        :request-api="getUserList"
+        :request-api="getTableList"
         :init-param="initParam"
         :data-callback="dataCallback"
         :search-col="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }"
       >
         <!-- 表格 header 按钮 -->
         <template #tableHeader>
-          <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
-          <el-button type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
-          <el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>
+          <el-button type="primary" :icon="CirclePlus" plain @click="openDrawer('新增')">新增用户</el-button>
+          <el-button type="danger" :icon="Delete" plain>删除</el-button>
+          <el-button type="info" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
+          <el-button type="warning" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>
           <el-button type="primary" plain @click="toDetail">To 平级详情页面</el-button>
         </template>
         <!-- 表格操作 -->
@@ -46,7 +47,7 @@ import { useDownload } from "@/hooks/useDownload";
 import ProTable from "@/components/ProTable/index.vue";
 import TreeFilter from "@/components/TreeFilter/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
-import UserDrawer from "@/views/proTable/components/UserDrawer.vue";
+import UserDrawer from "@/views/system/user/components/UserDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from "@element-plus/icons-vue";
 import {
@@ -57,23 +58,32 @@ import {
   resetUserPassWord,
   exportUserInfo,
   BatchAddUser,
-  getUserStatus,
-  getUserGender,
   getUserDepartment
 } from "@/api/modules/user";
+import { useDict } from "@/utils/dict";
+const { sys_normal_disable } = useDict("sys_normal_disable");
 
 const router = useRouter();
 
+const getTableList = (params: any) => {
+  let newParams = JSON.parse(JSON.stringify(params));
+  newParams.createTime && (newParams.startTime = newParams.createTime[0]);
+  newParams.createTime && (newParams.endTime = newParams.createTime[1]);
+  delete newParams.createTime;
+  return getUserList(newParams);
+};
+
 // 跳转详情页
 const toDetail = () => {
-  router.push(`/proTable/useTreeFilter/detail/123456?params=detail-page`);
+  router.push(`/system/accountManage/detail/123456?params=detail-page`);
+  // router.push(`/proTable/useTreeFilter/detail/123456?params=detail-page`);
 };
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable(之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ deptId: "1" });
+const initParam = reactive({ deptId: "" });
 
 const dataCallback = (data: any) => {
   return {
@@ -92,30 +102,38 @@ const changeTreeFilter = (val: string) => {
 
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
-  { prop: "userId", label: "用户编号", width: 80 },
-  { prop: "userName", label: "用户姓名", width: 120, search: { el: "input" } },
+  { prop: "userId", label: "用户编号", width: 100 },
+  { prop: "userName", label: "用户账号", width: 120, search: { el: "input" } },
   { prop: "nickName", label: "用户昵称", width: 120 },
   {
     prop: "deptId",
     label: "部门",
     width: 120,
-    sortable: true,
-    enum: getUserGender,
-    search: { el: "select" },
-    fieldNames: { label: "genderLabel", value: "genderValue" }
+    sortable: true
   },
+  { prop: "email", label: "手机号", search: { el: "input" } },
   { prop: "email", label: "邮箱" },
   {
     prop: "status",
-    label: "用户状态",
+    label: "状态",
     width: 120,
     sortable: true,
     tag: true,
-    enum: getUserStatus,
+    enum: sys_normal_disable,
     search: { el: "select" },
-    fieldNames: { label: "userLabel", value: "userStatus" }
+    fieldNames: { label: "label", value: "value" }
   },
-  { prop: "createTime", label: "创建时间", width: 180 },
+  {
+    prop: "createTime",
+    label: "创建时间",
+    width: 180,
+    search: {
+      el: "date-picker",
+      span: 2,
+      props: { type: "datetimerange", valueFormat: "YYYY-MM-DD HH:mm:ss" },
+      defaultValue: ["2022-11-12 11:35:00", "2022-12-12 11:35:00"]
+    }
+  },
   { prop: "operation", label: "操作", width: 330, fixed: "right" }
 ]);
 

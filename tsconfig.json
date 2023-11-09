@@ -36,7 +36,8 @@
     "src/**/*.vue",
     "config/**/*.ts",
     "config/**/*.d.ts",
-    "vite.config.ts"
+    "vite.config.ts",
+    "src/utils/dict.js"
   ],
   "exclude": ["node_modules", "dist", "**/*.js"]
 }
