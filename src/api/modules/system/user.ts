@@ -6,13 +6,12 @@ export const listUser = (params: User.ReqUserParams) => {
   return http.get<ResPage<User.ResUserList>>("/system/user/list", params);
 };
 
-// // 查询用户详细
-// export function getUser(userId) {
-//   return request({
-//     url: '/system/user/' + parseStrEmpty(userId),
-//     method: 'get'
-//   })
-// }
+// 查询用户详细
+export function getUser(userId: string | number | undefined) {
+  return http.get<ResPage<User.ResUserList>>(
+    `/system/user/${!userId || userId == "undefined" || userId == "null" ? "" : userId}`
+  );
+}
 
 //  新增用户
 export function addUser(data: string | object | undefined) {
@@ -29,27 +28,15 @@ export function delUser(userId: any) {
   return http.delete("/system/user/" + userId);
 }
 
-// // 用户密码重置
-export function resetUserPwd(userId: any, password: any) {
-  const data = {
-    userId,
-    password
-  };
+// 用户密码重置
+export function resetUserPwd(data: object | undefined) {
   return http.put("/system/user/resetPwd", data);
 }
-// export function resetUserPwd(userId, password) {
-//   const data = {
-//     userId,
-//     password
-//   }
-//   return request({
-//     url: '/system/user/resetPwd',
-//     method: 'put',
-//     data: data
-//   })
-// }
 
-// // 用户状态修改
+// 用户状态修改
+export function changeUserStatus(data: object | undefined) {
+  return http.put("/system/user/changeStatus", data);
+}
 // export function changeUserStatus(userId, status) {
 //   const data = {
 //     userId,
@@ -118,10 +105,7 @@ export function resetUserPwd(userId: any, password: any) {
 //   })
 // }
 
-// // 查询部门下拉树结构
-// export function deptTreeSelect() {
-//   return request({
-//     url: '/system/user/deptTree',
-//     method: 'get'
-//   })
-// }
+// 查询部门下拉树结构
+export const getUserDepartment = () => {
+  return http.get<User.ResDepartment[]>("/system/user/deptTree");
+};

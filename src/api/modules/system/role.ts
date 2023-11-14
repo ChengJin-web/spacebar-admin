@@ -1,6 +1,9 @@
-// import request from '@/utils/request'
+import http from "@/api";
 
-// // 查询角色列表
+//  查询角色列表
+export function listRole(query) {
+  return http.get("/system/role/list", query);
+}
 // export function listRole(query) {
 //   return request({
 //     url: '/system/role/list',

@@ -51,7 +51,7 @@
       <el-form-item label="岗位">
         <el-select v-model="drawerProps.row!.postIds" multiple placeholder="请选择">
           <el-option
-            v-for="item in postOptions"
+            v-for="item in drawerProps.row!.posts"
             :key="item.postId"
             :label="item.postName"
             :value="item.postId"
@@ -63,7 +63,7 @@
       <el-form-item label="角色">
         <el-select v-model="drawerProps.row!.roleIds" multiple placeholder="请选择">
           <el-option
-            v-for="item in roleOptions"
+            v-for="item in drawerProps.row!.roles"
             :key="item.roleId"
             :label="item.roleName"
             :value="item.roleId"
@@ -110,10 +110,6 @@ const rules = reactive<FormRules>({
 
 // 部门
 const deptOptions: any[] = [];
-// 岗位
-const postOptions: any[] = [];
-// 角色
-const roleOptions: any[] = [];
 
 interface DrawerProps {
   title: string;

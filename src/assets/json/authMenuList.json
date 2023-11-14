@@ -18,7 +18,7 @@
     {
       "path": "/system",
       "name": "system",
-      "redirect": "/system/accountManage",
+      "redirect": "/system/user",
       "meta": {
         "icon": "Tools",
         "title": "系统管理",
@@ -30,9 +30,9 @@
       },
       "children": [
         {
-          "path": "/system/accountManage",
-          "name": "accountManage",
-          "component": "/system/accountManage/index",
+          "path": "/system/user",
+          "name": "user",
+          "component": "/system/user/index",
           "meta": {
             "icon": "User",
             "title": "用户管理",

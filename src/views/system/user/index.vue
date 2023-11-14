@@ -26,10 +26,28 @@
         </template>
         <!-- 表格操作 -->
         <template #operation="scope">
-          <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
-          <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-          <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)">重置密码</el-button>
-          <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
+          <el-button
+            v-show="scope.row.userName !== 'admin'"
+            type="primary"
+            link
+            :icon="View"
+            @click="openDrawer('查看', scope.row)"
+            >查看
+          </el-button>
+          <el-button
+            v-show="scope.row.userName !== 'admin'"
+            type="primary"
+            link
+            :icon="EditPen"
+            @click="openDrawer('编辑', scope.row)"
+            >编辑
+          </el-button>
+          <el-button v-show="scope.row.userName !== 'admin'" type="primary" link :icon="Refresh" @click="resetPass(scope.row)">
+            重置密码
+          </el-button>
+          <el-button v-show="scope.row.userName !== 'admin'" type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">
+            删除
+          </el-button>
         </template>
       </ProTable>
       <UserDrawer ref="drawerRef" />
@@ -37,7 +55,7 @@
     </div>
   </div>
 </template>
-<script setup lang="ts" name="useTreeFilter">
+<script setup lang="tsx" name="useTreeFilter">
 import { ref, reactive } from "vue";
 import { User } from "@/api/interface";
 import { useRouter } from "vue-router";
@@ -47,10 +65,10 @@ import { useDownload } from "@/hooks/useDownload";
 import ProTable from "@/components/ProTable/index.vue";
 import TreeFilter from "@/components/TreeFilter/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
-import UserDrawer from "@/views/system/accountManage/UserDrawer.vue";
+import UserDrawer from "@/views/system/user/UserDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from "@element-plus/icons-vue";
-import { listUser, delUser, addUser, updateUser, resetUserPwd } from "@/api/modules/system/user";
+import { listUser, delUser, addUser, updateUser, resetUserPwd, changeUserStatus, getUser } from "@/api/modules/system/user";
 
 import { exportUserInfo, BatchAddUser, getUserDepartment } from "@/api/modules/user";
 import { useDict } from "@/utils/dict";
@@ -68,7 +86,7 @@ const getTableList = (params: any) => {
 
 // 跳转详情页
 const toDetail = () => {
-  router.push(`/system/accountManage/detail/123456?params=detail-page`);
+  router.push(`/system/user/detail/123456?params=detail-page`);
 };
 
 // ProTable 实例
@@ -97,23 +115,31 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { prop: "userId", label: "用户编号", width: 100 },
   { prop: "userName", label: "用户账号", width: 120, search: { el: "input" } },
   { prop: "nickName", label: "用户昵称", width: 120 },
-  {
-    prop: "deptId",
-    label: "部门",
-    width: 120,
-    sortable: true
-  },
+  { prop: "deptId", label: "部门", width: 120, sortable: true },
   { prop: "phonenumber", label: "手机号", search: { el: "input" } },
   { prop: "email", label: "邮箱" },
   {
     prop: "status",
-    label: "状态",
+    label: "用户状态",
     width: 120,
-    sortable: true,
-    tag: true,
     enum: sys_normal_disable,
-    search: { el: "select" },
-    fieldNames: { label: "label", value: "value" }
+    search: { el: "tree-select", props: { filterable: true } },
+    fieldNames: { label: "label", value: "value" },
+    render: scope => {
+      return (
+        <>
+          {
+            <el-switch
+              model-value={Number(scope.row.status)}
+              active-text={Number(scope.row.status) ? "启用" : "禁用"}
+              active-value={0}
+              inactive-value={1}
+              onClick={() => changeStatus(scope.row)}
+            />
+          }
+        </>
+      );
+    }
   },
   {
     prop: "createTime",
@@ -129,6 +155,16 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { prop: "operation", label: "操作", width: 330, fixed: "right" }
 ]);
 
+// 切换用户状态
+const changeStatus = async (row: User.ResUserList) => {
+  await useHandleData(
+    changeUserStatus,
+    { userId: row.userId, status: row.status == "1" ? "0" : "1 " },
+    `切换【${row.userName}】用户状态`
+  );
+  proTable.value?.getTableList();
+};
+
 // 删除用户信息
 const deleteAccount = async (params: User.ResUserList) => {
   await useHandleData(delUser, params.userId, `删除【${params.userName}】用户`);
@@ -137,7 +173,11 @@ const deleteAccount = async (params: User.ResUserList) => {
 
 // 重置用户密码
 const resetPass = async (params: User.ResUserList) => {
-  await useHandleData(resetUserPwd, { id: params.userId, password: "@2023" }, `重置【${params.userName}】用户密码`);
+  await useHandleData(
+    resetUserPwd,
+    { userId: params.userId, password: "spacebar@2023" },
+    `重置【${params.userName}】用户密码为spacebar@2023`
+  );
   proTable.value?.getTableList();
 };
 
@@ -162,11 +202,13 @@ const batchAdd = () => {
 
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof UserDrawer> | null>(null);
-const openDrawer = (title: string, row: Partial<User.ResUserList> = {}) => {
+const openDrawer = async (title: string, row: Partial<User.ResUserList> = {}) => {
+  const { posts, roles } = await getUser(row.userId);
+
   const params = {
     title,
     isView: title === "查看",
-    row: { ...row },
+    row: { ...row, posts, roles },
     api: title === "新增" ? addUser : title === "编辑" ? updateUser : undefined,
     getTableList: proTable.value?.getTableList
   };

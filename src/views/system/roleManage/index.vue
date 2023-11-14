@@ -18,22 +18,6 @@
           批量删除用户
         </el-button>
       </template>
-      <!-- Expand -->
-      <template #expand="scope">
-        {{ scope.row }}
-      </template>
-      <!-- usernameHeader -->
-      <template #usernameHeader="scope">
-        <el-button type="primary" @click="ElMessage.success('我是通过作用域插槽渲染的表头')">
-          {{ scope.column.label }}
-        </el-button>
-      </template>
-      <!-- createTime -->
-      <template #createTime="scope">
-        <el-button type="primary" link @click="ElMessage.success('我是通过作用域插槽渲染的内容')">
-          {{ scope.row.createTime }}
-        </el-button>
-      </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
@@ -53,25 +37,25 @@ import { useRouter } from "vue-router";
 import { User } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useDownload } from "@/hooks/useDownload";
-import { useAuthButtons } from "@/hooks/useAuthButtons";
 import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import UserDrawer from "@/views/proTable/components/UserDrawer.vue";
 import { ProTableInstance, ColumnProps, HeaderRenderScope } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from "@element-plus/icons-vue";
+import { listRole } from "@/api/modules/system/role";
 import {
-  getUserList,
   deleteUser,
   editUser,
   addUser,
   changeUserStatus,
   resetUserPassWord,
   exportUserInfo,
-  BatchAddUser,
-  getUserStatus,
-  getUserGender
+  BatchAddUser
 } from "@/api/modules/user";
+
+import { useDict } from "@/utils/dict";
+const { sys_normal_disable } = useDict("sys_normal_disable");
 
 const router = useRouter();
 
@@ -90,7 +74,7 @@ const initParam = reactive({ type: 1 });
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
 const dataCallback = (data: any) => {
   return {
-    list: data.list,
+    list: data.rows,
     total: data.total,
     pageNum: data.pageNum,
     pageSize: data.pageSize
@@ -98,17 +82,14 @@ const dataCallback = (data: any) => {
 };
 
 // 如果你想在请求之前对当前请求参数做一些操作，可以自定义如下函数：params 为当前所有的请求参数（包括分页），最后返回请求列表接口
-// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getUserList"
+// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="listRole"
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(params));
   newParams.createTime && (newParams.startTime = newParams.createTime[0]);
   newParams.createTime && (newParams.endTime = newParams.createTime[1]);
   delete newParams.createTime;
-  return getUserList(newParams);
+  return listRole(newParams);
 };
-
-// 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
-const { BUTTONS } = useAuthButtons();
 
 // 自定义渲染表头（使用tsx语法）
 const headerRender = (scope: HeaderRenderScope<User.ResUserList>) => {
@@ -122,72 +103,25 @@ const headerRender = (scope: HeaderRenderScope<User.ResUserList>) => {
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { type: "sort", label: "Sort", width: 80 },
-  { type: "expand", label: "Expand", width: 85 },
-  {
-    prop: "username",
-    label: "用户姓名",
-    search: { el: "input", tooltip: "我是搜索提示" },
-    render: scope => {
-      return (
-        <el-button type="primary" link onClick={() => ElMessage.success("我是通过 tsx 语法渲染的内容")}>
-          {scope.row.username}
-        </el-button>
-      );
-    }
-  },
-  {
-    prop: "gender",
-    label: "性别",
-    // 字典数据（本地数据）
-    // enum: genderType,
-    // 字典请求不带参数
-    enum: getUserGender,
-    // 字典请求携带参数
-    // enum: () => getUserGender({ id: 1 }),
-    search: { el: "select", props: { filterable: true } },
-    fieldNames: { label: "genderLabel", value: "genderValue" }
-  },
-  {
-    // 多级 prop
-    prop: "user.detail.age",
-    label: "年龄",
-    search: {
-      // 自定义 search 显示内容
-      render: ({ searchParam }) => {
-        return (
-          <div class="flx-center">
-            <el-input vModel_trim={searchParam.minAge} placeholder="最小年龄" />
-            <span class="mr10 ml10">-</span>
-            <el-input vModel_trim={searchParam.maxAge} placeholder="最大年龄" />
-          </div>
-        );
-      }
-    }
-  },
-  { prop: "idCard", label: "身份证号", search: { el: "input" } },
-  { prop: "email", label: "邮箱" },
-  { prop: "address", label: "居住地址" },
+  { prop: "idCard", label: "角色名称", search: { el: "input" } },
+  { prop: "email", label: "权限字符" },
+  { prop: "address", label: "显示顺序" },
   {
     prop: "status",
     label: "用户状态",
-    enum: getUserStatus,
+    enum: sys_normal_disable,
     search: { el: "tree-select", props: { filterable: true } },
     fieldNames: { label: "userLabel", value: "userStatus" },
     render: scope => {
       return (
         <>
-          {BUTTONS.value.status ? (
-            <el-switch
-              model-value={scope.row.status}
-              active-text={scope.row.status ? "启用" : "禁用"}
-              active-value={1}
-              inactive-value={0}
-              onClick={() => changeStatus(scope.row)}
-            />
-          ) : (
-            <el-tag type={scope.row.status ? "success" : "danger"}>{scope.row.status ? "启用" : "禁用"}</el-tag>
-          )}
+          <el-switch
+            model-value={scope.row.status}
+            active-text={scope.row.status ? "启用" : "禁用"}
+            active-value={1}
+            inactive-value={0}
+            onClick={() => changeStatus(scope.row)}
+          />
         </>
       );
     }
@@ -216,7 +150,7 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 
 // 删除用户信息
 const deleteAccount = async (params: User.ResUserList) => {
-  await useHandleData(deleteUser, { id: [params.id] }, `删除【${params.username}】用户`);
+  await useHandleData(deleteUser, { id: [params.roleId] }, `删除【${params.username}】用户`);
   proTable.value?.getTableList();
 };
 

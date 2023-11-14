@@ -10,6 +10,10 @@ export interface ResultData<T = any> extends Result {
   captchaEnabled: boolean;
   img: string;
   uuid: string;
+  postIds: T[];
+  posts: T[];
+  roleIds: T[];
+  roles: T[];
   data: T;
 }
 
@@ -67,6 +71,7 @@ export namespace User {
     status: number;
   }
   export interface ResUserList {
+    posts: any;
     createBy: string;
     createTime: string;
     updateBy: string;

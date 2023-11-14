@@ -3,7 +3,7 @@ import qs from "qs";
 
 // 根据字典类型查询字典数据信息
 export const getDicts = (dictType: string) => {
-  return http.get("/system/dict/data/type/" + dictType);
+  return http.get<T>("/system/dict/data/type/" + dictType);
 };
 
 // 查询字典数据列表
